@@ -1,12 +1,9 @@
-package com.example.to_doapp
+package com.example.todoist
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.to_doapp.databinding.ActivityUpdateTaskBinding
+import com.example.todoist.databinding.ActivityUpdateTaskBinding
 
 
 class UpdateTaskActivity : AppCompatActivity() {

@@ -1,10 +1,10 @@
-package com.example.to_doapp
+package com.example.todoist
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.to_doapp.databinding.ActivityMainBinding
+import com.example.todoist.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

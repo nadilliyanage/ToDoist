@@ -1,4 +1,4 @@
-package com.example.to_doapp
+package com.example.todoist
 
 import android.content.Context
 import android.content.Intent
