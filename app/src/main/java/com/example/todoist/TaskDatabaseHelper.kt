@@ -15,7 +15,7 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         private const val COLUMN_TITLE = "title"
         private const val COLUMN_CONTENT = "content"
     }
-//create the table
+
     override fun onCreate(db: SQLiteDatabase?) {
         val createTableQuery = "CREATE TABLE $TABLE_NAME (" +
                 "$COLUMN_ID INTEGER PRIMARY KEY," +
@@ -24,37 +24,40 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 ");"
         db?.execSQL(createTableQuery)
     }
-//drop  the table
+
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-       val dropTableQuery = "DROP TABLE IF EXISTS $TABLE_NAME"
+        val dropTableQuery = "DROP TABLE IF EXISTS $TABLE_NAME"
         db?.execSQL(dropTableQuery)
         onCreate(db)
-        }
-//ContentValues class is used to store data with column name
-    //insert data
-    fun insertTask(task: Task){
+    }
+
+    fun insertTask(task: Task) {
         val db = writableDatabase
-    val values= ContentValues().apply {
-        put(COLUMN_TITLE,task.title)
-        put(COLUMN_CONTENT,task.content)
+        val values = ContentValues().apply {
+            put(COLUMN_TITLE, task.title)
+            put(COLUMN_CONTENT, task.content)
+        }
+        db.insert(TABLE_NAME, null, values)
+        db.close()
     }
-    db.insert(TABLE_NAME,null,values)
-    db.close()
 
-    }
-
-    fun getAllTasks():List<Task>{
+    fun getAllTasks(searchQuery: String = ""): List<Task> {
         val taskList = mutableListOf<Task>()
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_NAME"
+        var query = "SELECT * FROM $TABLE_NAME"
+
+        if (searchQuery.isNotEmpty()) {
+            query += " WHERE $COLUMN_TITLE LIKE '%$searchQuery%' OR $COLUMN_CONTENT LIKE '%$searchQuery%'"
+        }
+
         val cursor = db.rawQuery(query, null)
 
-        while(cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
             val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
             val content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT))
 
-            val task= Task(id, title, content)
+            val task = Task(id, title, content)
             taskList.add(task)
         }
         cursor.close()
@@ -62,22 +65,21 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return taskList
     }
 
-    fun updateTask(task:Task){
+    fun updateTask(task: Task) {
         val db = writableDatabase
         val values = ContentValues().apply {
             put(COLUMN_TITLE, task.title)
             put(COLUMN_CONTENT, task.content)
         }
-
         val whereClause = "$COLUMN_ID = ?"
         val whereArgs = arrayOf(task.id.toString())
         db.update(TABLE_NAME, values, whereClause, whereArgs)
         db.close()
     }
 
-    fun getTaskbyId(taskId: Int): Task{
+    fun getTaskByID(taskId: Int): Task {
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID = $taskId"
+        val query = "SELECT * FROM $TABLE_NAME WHERE $COLUMN_ID=$taskId"
         val cursor = db.rawQuery(query, null)
         cursor.moveToFirst()
 
@@ -90,12 +92,11 @@ class TaskDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return Task(id, title, content)
     }
 
-    fun deleteTask(taskId: Int){
+    fun deleteTask(taskId: Int) {
         val db = writableDatabase
         val whereClause = "$COLUMN_ID = ?"
         val whereArgs = arrayOf(taskId.toString())
         db.delete(TABLE_NAME, whereClause, whereArgs)
         db.close()
     }
-
 }

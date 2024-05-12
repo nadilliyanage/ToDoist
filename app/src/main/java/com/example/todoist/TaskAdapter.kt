@@ -10,52 +10,57 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
-class TaskAdapter(private var tasks: List<Task>,  context: Context) :
+class TaskAdapter(private var tasks: List<Task>, private val context: Context) :
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
-        private val  db: TaskDatabaseHelper = TaskDatabaseHelper(context)
+    private val db: TaskDatabaseHelper = TaskDatabaseHelper(context)
+    private var filteredTasks: List<Task> = tasks.toList()
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
         val contentTextView: TextView = itemView.findViewById(R.id.contentTextView)
-        val updateButton: ImageView = itemView.findViewById(R.id.updateButton)
-        val deleteButton: ImageView = itemView.findViewById(R.id.deleteButton)
+        val updateBtn: ImageView = itemView.findViewById(R.id.updateButton)
+        val deleteBtn: ImageView = itemView.findViewById(R.id.deleteButton)
     }
 
-    // Setup the item layout view
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.task_item, parent, false)
         return TaskViewHolder(view)
     }
 
-    // Get the size
     override fun getItemCount(): Int {
-        return tasks.size
+        return filteredTasks.size
     }
 
-    // Set data on the element
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        val task = tasks[position]
+        val task = filteredTasks[position]
         holder.titleTextView.text = task.title
         holder.contentTextView.text = task.content
 
-        holder.updateButton.setOnClickListener{
-            val intent = Intent(holder.itemView.context, UpdateTaskActivity::class.java).apply{
+        holder.updateBtn.setOnClickListener {
+            val intent = Intent(holder.itemView.context, UpdateTaskActivity::class.java).apply {
                 putExtra("task_id", task.id)
             }
             holder.itemView.context.startActivity(intent)
         }
 
-        holder.deleteButton.setOnClickListener {
+        holder.deleteBtn.setOnClickListener {
             db.deleteTask(task.id)
             refreshData(db.getAllTasks())
             Toast.makeText(holder.itemView.context, "Task Deleted", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun refreshData(newTasks:List<Task>){
-        tasks=newTasks
+    fun filterTasks(query: String) {
+        filteredTasks = tasks.filter { task ->
+            task.title.contains(query, ignoreCase = true) || task.content.contains(query, ignoreCase = true)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun refreshData(newTasks: List<Task>) {
+        tasks = newTasks
+        filteredTasks = tasks.toList()
         notifyDataSetChanged()
     }
 }
