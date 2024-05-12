@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">To-Do App</string>
+    <string name="Add_Task">Add Task</string>
+    <string name="task_title_hint">Enter the title</string>
+    <string name="Task_description_box">Enter the description</string>
+    <string name="task_heading">TASK</string>
+    <string name="task_title">Title</string>
+    <string name="content">TASK DESCRIPTION</string>
+</resources>
